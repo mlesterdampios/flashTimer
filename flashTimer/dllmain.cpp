@@ -102,74 +102,66 @@ DWORD WINAPI HackThread(HMODULE hModule)
 				auto Index = obj->GetIndex();
 				auto IsEnemyToLocalPlayer = obj->IsEnemyTo(me);
 
-				if (IsHero) {
+				if (IsHero && (Index != me_index) && IsEnemyToLocalPlayer) {
 					auto d_spellSlot = obj->GetSpellSlotByID(4);
 					auto d_doneCD = d_spellSlot->IsDoneCD(gameTime);
 
 					auto f_spellSlot = obj->GetSpellSlotByID(5);
 					auto f_doneCD = f_spellSlot->IsDoneCD(gameTime);
 
+					auto AttackRange = obj->GetAttackRange();
 
-					if (Index != me_index) { //not the localPlayer
-						auto AttackRange = obj->GetAttackRange();
+					//MENU:Track Enemy Flash (J Key) (Self)
+					if (g_track_enemy_flash)
+					{
+						if ((j_key_flag == 1 && is_j_key_ready) || (x_key_flag == 1 && is_x_key_ready)) {
 
-						if (!IsEnemyToLocalPlayer) { // ally
-						}
-						else { // enemy
-							//MENU:Track Enemy Flash (J Key) (Self)
-							if (g_track_enemy_flash)
-							{
-								if ((j_key_flag == 1 && is_j_key_ready) || (x_key_flag == 1 && is_x_key_ready)) {
+							auto champName = obj->GetChampionName();
 
-									auto champName = obj->GetChampionName();
+							auto d_CDTime = d_spellSlot->GetTime();
+							auto d_spellName = d_spellSlot->GetSpellInfo()->GetSpellData()->GetSpellName();
 
-									auto d_CDTime = d_spellSlot->GetTime();
-									auto d_spellName = d_spellSlot->GetSpellInfo()->GetSpellData()->GetSpellName();
+							auto f_CDTime = f_spellSlot->GetTime();
+							auto f_spellName = f_spellSlot->GetSpellInfo()->GetSpellData()->GetSpellName();
 
-									auto f_CDTime = f_spellSlot->GetTime();
-									auto f_spellName = f_spellSlot->GetSpellInfo()->GetSpellData()->GetSpellName();
+							float flashCoolDown = 0;
+							bool summonerFlashFound = false;
 
-									float flashCoolDown = 0;
-									bool summonerFlashFound = false;
+							//Engine::PrintChat(d_spellName);
+							//Engine::PrintChat(f_spellName);
 
-									//Engine::PrintChat(d_spellName);
-									//Engine::PrintChat(f_spellName);
-
-									if (strcmp(d_spellName, "SummonerFlash") == 0) {
-										if (!d_doneCD) {
-											summonerFlashFound = true;
-											flashCoolDown = d_CDTime;
-										}
-									}
-									else if (strcmp(f_spellName, "SummonerFlash") == 0) {
-										if (!f_doneCD) {
-											summonerFlashFound = true;
-											flashCoolDown = f_CDTime;
-										}
-									}
-
-									if (summonerFlashFound) {
-										int hour;
-										int seconds;
-										int minutes;
-
-										//calling Convert function
-										Engine::SecondsToClock((int)flashCoolDown, hour, minutes, seconds);
-
-										char str_seconds[MAXIMUM_TEXT_SIZE];
-										snprintf(str_seconds, MAXIMUM_TEXT_SIZE, "%d", seconds);
-
-										char str_minutes[MAXIMUM_TEXT_SIZE];
-										snprintf(str_minutes, MAXIMUM_TEXT_SIZE, "%d", minutes);
-
-										string champNameString(champName);
-										string str_minutes_String(str_minutes);
-										string str_seconds_String(str_seconds);
-										msgString += champNameString + " " + (minutes < 10 ? "0" : "") + str_minutes_String + "" + (seconds < 10 ? "0" : "") + str_seconds_String + " "; //buffer the string to print out later after the whole fucking while loop
-									}
+							if (strcmp(d_spellName, "SummonerFlash") == 0) {
+								if (!d_doneCD) {
+									summonerFlashFound = true;
+									flashCoolDown = d_CDTime;
+								}
+							}
+							else if (strcmp(f_spellName, "SummonerFlash") == 0) {
+								if (!f_doneCD) {
+									summonerFlashFound = true;
+									flashCoolDown = f_CDTime;
 								}
 							}
 
+							if (summonerFlashFound) {
+								int hour;
+								int seconds;
+								int minutes;
+
+								//calling Convert function
+								Engine::SecondsToClock((int)flashCoolDown, hour, minutes, seconds);
+
+								char str_seconds[MAXIMUM_TEXT_SIZE];
+								snprintf(str_seconds, MAXIMUM_TEXT_SIZE, "%d", seconds);
+
+								char str_minutes[MAXIMUM_TEXT_SIZE];
+								snprintf(str_minutes, MAXIMUM_TEXT_SIZE, "%d", minutes);
+
+								string champNameString(champName);
+								string str_minutes_String(str_minutes);
+								string str_seconds_String(str_seconds);
+								msgString += champNameString + " " + (minutes < 10 ? "0" : "") + str_minutes_String + "" + (seconds < 10 ? "0" : "") + str_seconds_String + " "; //buffer the string to print out later after iterating all object
+							}
 						}
 					}
 				}
