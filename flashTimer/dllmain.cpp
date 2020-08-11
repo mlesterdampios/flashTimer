@@ -109,8 +109,6 @@ DWORD WINAPI HackThread(HMODULE hModule)
 					auto f_spellSlot = obj->GetSpellSlotByID(5);
 					auto f_doneCD = f_spellSlot->IsDoneCD(gameTime);
 
-					auto AttackRange = obj->GetAttackRange();
-
 					//MENU:Track Enemy Flash (J Key) (Self)
 					if (g_track_enemy_flash)
 					{
