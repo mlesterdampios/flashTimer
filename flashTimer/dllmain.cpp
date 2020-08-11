@@ -166,6 +166,7 @@ DWORD WINAPI HackThread(HMODULE hModule)
 				obj = holzer.GetNextObject(obj);
 			}
 
+			// after iterating all objects, i will now print the buffered string.
 			if (g_track_enemy_flash) {
 				if (msgString != "") {
 					if (j_key_flag == 1 && is_j_key_ready) {
